@@ -1,4 +1,7 @@
 *.pyc
-*.zip
-dist
-
+env27
+MANIFEST
+MANIFEST.in
+Makefile.in
+*.egg-info
+*.swp

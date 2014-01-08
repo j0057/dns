@@ -5,12 +5,56 @@ import re
 import itertools
 import sys
 
-def memoize(cache):
+def ip4_to_arpa(address):
+    if re.match(r'^\d+\.\d+\.\d+\.\d+$', address):
+        parts = address.split('.')
+        if max(int(s, 10) for s in parts) <= 255:
+            return '.'.join(parts[::-1]) + '.in-addr.arpa'
+    return None
+
+def tel_to_arpa(address):
+    if re.match(r'^\+\d+$', address):
+        address = address[1:]
+        return '.'.join(address[::-1]) + '.e164.arpa'
+    return None
+
+# 2001:980:2405:1111::1
+
+def ip6_to_arpa(address):
+    address = address.replace('-', ':')
+    if re.match(r'^[0-9a-f:]+$', address):
+        parts = address.split(':')
+        if  all(0 <= len(p) <= 4 for p in parts) \
+        and (0 < len(parts) <= 8):
+            try:
+                e = parts.index('')
+            except ValueError:
+                e = -1
+            while e >= 0 and parts[e] == '':
+                print parts
+                parts[e:e+1] = ['', '0']
+                if len(parts) > 8:
+                    parts[e:e+1] = []
+            for i in range(0, len(parts) - 1):
+                while len(parts[i]) < 4:
+                    parts[i] = '0' + parts[i]
+            parts = ''.join(parts)
+            print repr(parts)
+            return '.'.join(parts[::-1]) + '.ip6.arpa'
+    return None
+
+def arpa_address(address):
+    return ip4_to_arpa(address) \
+        or tel_to_arpa(address) \
+        or ip6_to_arpa(address)
+
+def memoize(cache, key_func=lambda a: a):
     def memoize_dec(f):
         def memoize_func(*a):
-            if a not in cache:
-                cache[a] = f(*a)
-            return cache[a]
+            key = key_func(a)
+            if key not in cache:
+                cache[key] = f(*a)
+            return cache[key]
         return memoize_func
     return memoize_dec
        
@@ -38,9 +82,12 @@ def run(cmd, stdin=None):
     if stderr:
         raise Exception(stderr)
 
-    return p.stdout.read()
+    result = p.stdout.read()
+    print result
+    return result
 
 def resolver(t='ANY'):
+    #memoize({}, key_func=lambda a: (a[0].lower(), a[1].lower()))
     @memoize({})
     def resolve(hostname, dns_server):
         query = "dig +norecurse +noall +authority +answer +additional -t {2} {0} @{1}".format(hostname, dns_server.strip(), t)
@@ -59,10 +106,10 @@ def rec_query(hostname, dns_server, resolver=RESOLVER):
     result = resolver(hostname, dns_server)
     is_auth = any(r[-1] == dns_server for r in result if r[3] == 'NS')
     is_finished = all(r[0] == '.' for r in result if r[3] == 'NS')
-    yield (dns_server, result)
+    yield (dns_server.lower(), result)
     for answer in result:
         if not is_auth and not is_finished and answer[3] == 'NS':
-            for sub_answer in rec_query(hostname, answer[-1], resolver):
+            for sub_answer in rec_query(hostname, answer[-1].lower(), resolver):
                 yield sub_answer
 
 @wrap(list)
@@ -111,14 +158,17 @@ def gen_graph(title, tree, labels, filename):
 
     graph.layout(prog='dot')
     graph.draw(filename)
-    
+
 if __name__ == '__main__':
-    result = root_query(sys.argv[1])
-    for dns_server, answers in result:
-        print '###', dns_server
-        for answer in answers:
-            print ' '.join(answer)
-    #tree = gen_tree(result)
-    #labels = gen_labels(result)
-    #gen_graph(tree, labels, 'dns-' + sys.argv[1] + '.png')
+    if len(sys.argv) == 1:
+        print arpa_address('80.100.32.39')
+        print arpa_address('+31644015510')
+        print arpa_address('2001:db8::567:89ab')
+    elif len(sys.argv) == 2:    
+        result = root_query(sys.argv[1])
+        for dns_server, answers in result:
+            print '###', dns_server
+            for answer in answers:
+                print ' '.join(answer)
+            print
 
