@@ -149,7 +149,7 @@ download: $(ENV) $(PIP_REQ)
 	$(ENV)/bin/pip wheel --no-index --find-links=$(WHL) --use-wheel --wheel-dir=$(WHL) --requirement $(PIP_REQ) $(QUIET)
 
 MANIFEST.in: setup.py | $(ENV)
-	$(ENV)/bin/python ./setup.py --static-dirs | sed 's/^/recursive-include / ; s/$$/ *.*/' > MANIFEST.in
+	$(ENV)/bin/python ./setup.py -q metadata --key=x_static_dirs | sed 's/^/recursive-include / ; s/$$/ *.*/' > MANIFEST.in
 
 release: $(ENV) MANIFEST.in release-pkg-$(PIP_NAME) 
 
