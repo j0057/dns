@@ -139,8 +139,8 @@ $(WHL)-ok:
 	mkdir -p $(WHL)
 	virtualenv pkg-env $(QUIET)
 	pkg-env/bin/pip install --upgrade pip setuptools wheel $(QUIET)
-	pkg-env/bin/pip install --no-use-wheel --download $(WHL) pip setuptools wheel $(QUIET)
-	pkg-env/bin/pip wheel --no-index --find-links=$(WHL) --use-wheel --wheel-dir=$(WHL) pip setuptools wheel $(QUIET)
+	pkg-env/bin/pip install --no-use-wheel --download $(WHL) -r build/req.txt $(QUIET)
+	pkg-env/bin/pip wheel --no-index --find-links=$(WHL) --use-wheel --wheel-dir=$(WHL) -r req.txt $(QUIET)
 	rm -rf pkg-env
 	touch $(WHL)-ok
 
