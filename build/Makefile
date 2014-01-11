@@ -80,7 +80,7 @@ runtime-live: $(ENV) unlink-code unlink-data deploy-code
 runtime-test: $(ENV) undeploy-code link-pkgs link-code link-data
 
 $(ENV): $(WHL)-ok
-	virtualenv --python=$(PY_VERSION) $(ENV) $(QUIET)
+	virtualenv --python=$(PY_VERSION) --extra-search-dir=$(WHL) $(ENV) $(QUIET)
 	$(ENV)/bin/pip install --no-index --find-links=$(WHL) --use-wheel --upgrade --requirement build/req.txt $(QUIET)
 
 # packages
@@ -140,7 +140,7 @@ $(WHL)-ok:
 	virtualenv pkg-env $(QUIET)
 	pkg-env/bin/pip install --upgrade pip setuptools wheel $(QUIET)
 	pkg-env/bin/pip install --no-use-wheel --download $(WHL) -r build/req.txt $(QUIET)
-	pkg-env/bin/pip wheel --no-index --find-links=$(WHL) --use-wheel --wheel-dir=$(WHL) -r req.txt $(QUIET)
+	pkg-env/bin/pip wheel --no-index --find-links=$(WHL) --use-wheel --wheel-dir=$(WHL) -r build/req.txt $(QUIET)
 	rm -rf pkg-env
 	touch $(WHL)-ok
 
