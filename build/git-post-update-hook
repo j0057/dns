@@ -1,0 +1,9 @@
+#!/bin/bash
+if [ "$1" = "refs/heads/master" ]; then
+    cd .. ; unset GIT_DIR GIT_WORK_TREE
+    if [ $(git rev-parse --abbrev-ref HEAD) != "config" ]; then
+        git checkout config
+    fi
+    git rebase master
+    make download release deploy QUIET=
+fi
