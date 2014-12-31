@@ -6,3 +6,4 @@ Makefile.in
 requirements.txt
 *.egg-info
 *.swp
+env

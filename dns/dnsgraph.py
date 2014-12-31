@@ -143,8 +143,9 @@ def gen_graph(title, tree, labels, filename):
     nodes = dict((key, dict((item[1], None) for item in group))
         for (key, group) in itertools.groupby(tree, lambda n: n[0]))
 
-    graph = pg.AGraph(nodes, splines='ortho', rankdir='TB')
-    graph.layout(prog='dot')
+    graph = pg.AGraph(nodes, splines='polyline', rankdir='TB')
+    if not filename.endswith('.dot'):
+        graph.layout(prog='dot')
 
     all_keys = set([i for (i,_) in tree] + [i for (_,i) in tree])
     for key in all_keys:
@@ -153,18 +154,18 @@ def gen_graph(title, tree, labels, filename):
         node = graph.get_node(key)
         node.attr['label'] = labels[key].replace('\n', '\\l') + '\\l'
         node.attr['shape'] = 'box'
-        node.attr['height'] = 0.0
+        #node.attr['height'] = 0.0
         node.attr['fontsize'] = 10.0
 
-    graph.layout(prog='dot')
-    graph.draw(filename)
+    if filename.endswith('.dot'):
+        with open(filename, 'wb') as f:
+            f.write(graph.to_string())
+    else:
+        graph.layout(prog='dot')
+        graph.draw(filename)
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        print arpa_address('80.100.32.39')
-        print arpa_address('+31644015510')
-        print arpa_address('2001:db8::567:89ab')
-    elif len(sys.argv) == 2:    
+    if len(sys.argv) == 2:    
         result = root_query(sys.argv[1])
         for dns_server, answers in result:
             print '###', dns_server

@@ -77,9 +77,13 @@ class DNSRouter(xhttp.Router):
             (r'^/dns/(\+?[a-z0-9\.:-]+)$',                 DNSRedirect())
         )
 
-app = DNSRouter()
-app = xhttp.catcher(app)
-app = xhttp.xhttp_app(app)
+#app = DNSRouter()
+#app = xhttp.catcher(app)
+#app = xhttp.xhttp_app(app)
+
+stack = lambda obj, *wrappers: reduce(lambda obj, wrapper: wrapper(obj), wrappers, obj)
+
+app = stack(DNSRouter(), xhttp.catcher, xhttp.xhttp_app)
 
 if __name__ == '__main__':
     xhttp.run_server(app)
