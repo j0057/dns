@@ -12,7 +12,8 @@ setup(
     author_email='j.j.molenaar@gmail.com',
     url='https://github.com/j0057/dns',
     name='dns',
-    version='0.1.0',
+    version_command='git describe',
+    version_command_pep440='git-dev',
     packages=['dns'],
     data_files=[ (root, map(lambda f: root + '/' + f, files))
                  for src_dir in static_dirs

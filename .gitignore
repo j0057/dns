@@ -1,9 +1,6 @@
 *.pyc
-env27
-MANIFEST
+env
 MANIFEST.in
-Makefile.in
 requirements.txt
 *.egg-info
 *.swp
-env
