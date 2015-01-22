@@ -7,11 +7,18 @@ static_dirs = ['conf']
 from setuptools import setup
 import os
 
+try:
+    with open('dns.egg-info/version.txt') as f: 
+        version = f.read()
+except:
+    version = None
+
 setup(
     author='Joost Molenaar',
     author_email='j.j.molenaar@gmail.com',
     url='https://github.com/j0057/dns',
     name='dns',
+    version=version,
     version_command=('git describe', 'pep440-git-dev'),
     packages=['dns'],
     data_files=[ (root, map(lambda f: root + '/' + f, files))
