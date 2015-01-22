@@ -4,7 +4,7 @@ repo_names = ['xmlist', 'xhttp']
 dist_names = ['pygraphviz']
 static_dirs = ['conf']
 
-from setuptools import setup
+import setuptools
 import os
 
 try:
@@ -13,7 +13,7 @@ try:
 except:
     version = None
 
-setup(
+setuptools.setup(
     author='Joost Molenaar',
     author_email='j.j.molenaar@gmail.com',
     url='https://github.com/j0057/dns',
@@ -21,7 +21,7 @@ setup(
     version=version,
     version_command=('git describe', 'pep440-git-dev'),
     packages=['dns'],
-    data_files=[ (root, map(lambda f: root + '/' + f, files))
+    data_files=[ (root, [ root + '/' + f for f in files ])
                  for src_dir in static_dirs
                  for (root, dirs, files) in os.walk(src_dir) ],
     install_requires=dist_names + repo_names,
