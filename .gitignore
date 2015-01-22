@@ -3,4 +3,3 @@ env
 MANIFEST.in
 requirements.txt
 *.egg-info
-*.swp
