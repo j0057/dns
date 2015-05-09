@@ -19,7 +19,7 @@ setuptools.setup(
     url='https://github.com/j0057/dns',
     name='dns',
     version=version,
-    version_command=('git describe', 'pep440-git-dev'),
+    version_command=('git describe', 'pep440-git'),
     packages=['dns'],
     data_files=[ (root, [ root + '/' + f for f in files ])
                  for src_dir in static_dirs
